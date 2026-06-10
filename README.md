@@ -11,7 +11,9 @@ treasury.
 ```
 programs/coinflip/src/lib.rs        the program
 programs/coinflip/tests/coinflip.rs LiteSVM integration tests
+idl/coinflip.json                   Anchor IDL (built by scripts/build-idl.mjs)
 examples/coinflip.ts                @solana/kit example client (devnet)
+examples/generated/                 typed client generated from the IDL by Codama
 ```
 
 ## How a bet works
@@ -90,6 +92,23 @@ expiry, permissionless settlement) stays valid.
 cargo build-sbf          # builds target/deploy/coinflip.so
 cargo test               # runs the LiteSVM integration tests
 ```
+
+## IDL & generated TypeScript client
+
+The Anchor IDL is produced without the anchor CLI by running the hidden
+`idl-build` tests and assembling their output:
+
+```sh
+node scripts/build-idl.mjs        # writes idl/coinflip.json
+cd examples && node codama.mjs    # renders examples/generated/ with Codama
+```
+
+The example client is built on the [Codama](https://github.com/codama-idl/codama)-generated
+code (`@codama/nodes-from-anchor` + `@codama/renderers-js`): typed
+instruction builders that resolve every PDA and default account themselves
+(`getPlaceBetInstructionAsync`, `getSettleBetInstructionAsync`, …), account
+fetchers (`fetchConfig`, `fetchBet`), PDA helpers (`findBetPda`, …) and the
+`Choice` enum. Regenerate after changing the program's interface.
 
 The tests cover: win/loss payouts and lock release, bet size limits,
 insolvency rejection, settling too early, double settlement, expiry

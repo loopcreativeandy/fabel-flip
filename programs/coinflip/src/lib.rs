@@ -327,11 +327,11 @@ pub struct Initialize<'info> {
         init,
         payer = admin,
         space = 8 + Config::INIT_SPACE,
-        seeds = [CONFIG_SEED],
+        seeds = [b"config"],
         bump
     )]
     pub config: Account<'info, Config>,
-    #[account(mut, seeds = [TREASURY_SEED], bump)]
+    #[account(mut, seeds = [b"treasury"], bump)]
     pub treasury: SystemAccount<'info>,
     pub system_program: Program<'info, System>,
 }
@@ -340,7 +340,7 @@ pub struct Initialize<'info> {
 pub struct FundTreasury<'info> {
     #[account(mut)]
     pub funder: Signer<'info>,
-    #[account(mut, seeds = [TREASURY_SEED], bump)]
+    #[account(mut, seeds = [b"treasury"], bump)]
     pub treasury: SystemAccount<'info>,
     pub system_program: Program<'info, System>,
 }
@@ -350,15 +350,15 @@ pub struct FundTreasury<'info> {
 pub struct PlaceBet<'info> {
     #[account(mut)]
     pub player: Signer<'info>,
-    #[account(mut, seeds = [CONFIG_SEED], bump = config.bump)]
+    #[account(mut, seeds = [b"config"], bump = config.bump)]
     pub config: Account<'info, Config>,
-    #[account(mut, seeds = [TREASURY_SEED], bump = config.treasury_bump)]
+    #[account(mut, seeds = [b"treasury"], bump = config.treasury_bump)]
     pub treasury: SystemAccount<'info>,
     #[account(
         init,
         payer = player,
         space = 8 + Bet::INIT_SPACE,
-        seeds = [BET_SEED, player.key().as_ref(), &nonce.to_le_bytes()],
+        seeds = [b"bet", player.key().as_ref(), &nonce.to_le_bytes()],
         bump
     )]
     pub bet: Account<'info, Bet>,
@@ -367,15 +367,15 @@ pub struct PlaceBet<'info> {
 
 #[derive(Accounts)]
 pub struct SettleBet<'info> {
-    #[account(mut, seeds = [CONFIG_SEED], bump = config.bump)]
+    #[account(mut, seeds = [b"config"], bump = config.bump)]
     pub config: Account<'info, Config>,
-    #[account(mut, seeds = [TREASURY_SEED], bump = config.treasury_bump)]
+    #[account(mut, seeds = [b"treasury"], bump = config.treasury_bump)]
     pub treasury: SystemAccount<'info>,
     #[account(
         mut,
         close = player,
         has_one = player,
-        seeds = [BET_SEED, bet.player.as_ref(), &bet.nonce.to_le_bytes()],
+        seeds = [b"bet", bet.player.as_ref(), &bet.nonce.to_le_bytes()],
         bump = bet.bump
     )]
     pub bet: Account<'info, Bet>,
@@ -390,13 +390,13 @@ pub struct SettleBet<'info> {
 
 #[derive(Accounts)]
 pub struct ExpireBet<'info> {
-    #[account(mut, seeds = [CONFIG_SEED], bump = config.bump)]
+    #[account(mut, seeds = [b"config"], bump = config.bump)]
     pub config: Account<'info, Config>,
     #[account(
         mut,
         close = player,
         has_one = player,
-        seeds = [BET_SEED, bet.player.as_ref(), &bet.nonce.to_le_bytes()],
+        seeds = [b"bet", bet.player.as_ref(), &bet.nonce.to_le_bytes()],
         bump = bet.bump
     )]
     pub bet: Account<'info, Bet>,
@@ -408,9 +408,9 @@ pub struct ExpireBet<'info> {
 #[derive(Accounts)]
 pub struct WithdrawHouse<'info> {
     pub admin: Signer<'info>,
-    #[account(seeds = [CONFIG_SEED], bump = config.bump, has_one = admin)]
+    #[account(seeds = [b"config"], bump = config.bump, has_one = admin)]
     pub config: Account<'info, Config>,
-    #[account(mut, seeds = [TREASURY_SEED], bump = config.treasury_bump)]
+    #[account(mut, seeds = [b"treasury"], bump = config.treasury_bump)]
     pub treasury: SystemAccount<'info>,
     /// CHECK: any destination the admin chooses.
     #[account(mut)]

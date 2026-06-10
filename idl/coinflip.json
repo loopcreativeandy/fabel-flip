@@ -1,0 +1,789 @@
+{
+  "address": "7ffE4JF4ZNCmnxQZWFxFT3ny9VDsf3LDJ1vbUNjLspX3",
+  "metadata": {
+    "name": "coinflip",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Provably-fair SOL coinflip with a 51/49 house edge"
+  },
+  "instructions": [
+    {
+      "name": "initialize",
+      "docs": [
+        "One-time setup: creates the config and makes the treasury PDA",
+        "rent-exempt so it can never be garbage-collected."
+      ],
+      "discriminator": [
+        175,
+        175,
+        109,
+        31,
+        13,
+        152,
+        155,
+        237
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "fund_treasury",
+      "docs": [
+        "Anyone may add house liquidity to the treasury."
+      ],
+      "discriminator": [
+        71,
+        154,
+        45,
+        220,
+        206,
+        32,
+        174,
+        239
+      ],
+      "accounts": [
+        {
+          "name": "funder",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "place_bet",
+      "docs": [
+        "Place a bet of `amount` lamports on `choice`. The outcome is decided",
+        "by the hash of slot `current_slot + COMMIT_DELAY_SLOTS`, which does",
+        "not exist yet."
+      ],
+      "discriminator": [
+        222,
+        62,
+        67,
+        220,
+        63,
+        166,
+        126,
+        33
+      ],
+      "accounts": [
+        {
+          "name": "player",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "player"
+              },
+              {
+                "kind": "arg",
+                "path": "nonce"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "nonce",
+          "type": "u64"
+        },
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "choice",
+          "type": {
+            "defined": {
+              "name": "Choice"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "settle_bet",
+      "docs": [
+        "Settle a bet once its target slot has been produced. Permissionless:",
+        "anyone may crank this; the payout always goes to the recorded player."
+      ],
+      "discriminator": [
+        115,
+        55,
+        234,
+        177,
+        227,
+        4,
+        10,
+        67
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bet.player",
+                "account": "Bet"
+              },
+              {
+                "kind": "account",
+                "path": "bet.nonce",
+                "account": "Bet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "relations": [
+            "bet"
+          ]
+        },
+        {
+          "name": "slot_hashes",
+          "address": "SysvarS1otHashes111111111111111111111111111"
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "expire_bet",
+      "docs": [
+        "Forfeit a bet whose settlement window has passed. The bet lamports",
+        "stay in the treasury; only the bet account rent is refunded to the",
+        "player. Permissionless. (A refund here would let players settle only",
+        "winning bets, so expiry must favor the house.)"
+      ],
+      "discriminator": [
+        179,
+        43,
+        160,
+        55,
+        113,
+        199,
+        6,
+        155
+      ],
+      "accounts": [
+        {
+          "name": "config",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "bet",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "bet.player",
+                "account": "Bet"
+              },
+              {
+                "kind": "account",
+                "path": "bet.nonce",
+                "account": "Bet"
+              }
+            ]
+          }
+        },
+        {
+          "name": "player",
+          "writable": true,
+          "relations": [
+            "bet"
+          ]
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "withdraw_house",
+      "docs": [
+        "Admin withdrawal of house profit. Lamports reserved for pending",
+        "payouts (and the treasury's rent minimum) can never be withdrawn."
+      ],
+      "discriminator": [
+        226,
+        236,
+        222,
+        156,
+        198,
+        230,
+        70,
+        147
+      ],
+      "accounts": [
+        {
+          "name": "admin",
+          "signer": true,
+          "relations": [
+            "config"
+          ]
+        },
+        {
+          "name": "config",
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  110,
+                  102,
+                  105,
+                  103
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "destination",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Bet",
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
+    },
+    {
+      "name": "Config",
+      "discriminator": [
+        155,
+        12,
+        170,
+        224,
+        30,
+        250,
+        204,
+        130
+      ]
+    }
+  ],
+  "types": [
+    {
+      "name": "Bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "choice",
+            "type": {
+              "defined": {
+                "name": "Choice"
+              }
+            }
+          },
+          {
+            "name": "target_slot",
+            "docs": [
+              "The bet is decided by this slot's hash."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Choice",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Heads"
+          },
+          {
+            "name": "Tails"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Config",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin",
+            "type": "pubkey"
+          },
+          {
+            "name": "locked_lamports",
+            "docs": [
+              "Sum of the 2x payouts of all pending bets. Invariant:",
+              "treasury_lamports >= rent_min + locked_lamports."
+            ],
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "treasury_bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetExpired",
+      "type": {
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ],
+        "kind": "struct"
+      }
+    },
+    {
+      "name": "BetPlaced",
+      "type": {
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "choice",
+            "type": {
+              "defined": {
+                "name": "Choice"
+              }
+            }
+          },
+          {
+            "name": "target_slot",
+            "type": "u64"
+          }
+        ],
+        "kind": "struct"
+      }
+    },
+    {
+      "name": "BetSettled",
+      "type": {
+        "fields": [
+          {
+            "name": "player",
+            "type": "pubkey"
+          },
+          {
+            "name": "nonce",
+            "type": "u64"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "choice",
+            "type": {
+              "defined": {
+                "name": "Choice"
+              }
+            }
+          },
+          {
+            "name": "result",
+            "type": {
+              "defined": {
+                "name": "Choice"
+              }
+            }
+          },
+          {
+            "name": "win",
+            "type": "bool"
+          },
+          {
+            "name": "payout",
+            "type": "u64"
+          }
+        ],
+        "kind": "struct"
+      }
+    }
+  ],
+  "events": [
+    {
+      "discriminator": [
+        43,
+        67,
+        162,
+        239,
+        216,
+        73,
+        136,
+        104
+      ],
+      "name": "BetExpired"
+    },
+    {
+      "discriminator": [
+        88,
+        88,
+        145,
+        226,
+        126,
+        206,
+        32,
+        0
+      ],
+      "name": "BetPlaced"
+    },
+    {
+      "discriminator": [
+        57,
+        145,
+        224,
+        160,
+        62,
+        119,
+        227,
+        206
+      ],
+      "name": "BetSettled"
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "BetTooSmall",
+      "msg": "Bet is below the 0.1 SOL minimum"
+    },
+    {
+      "code": 6001,
+      "name": "BetTooLarge",
+      "msg": "Bet is above the 10 SOL maximum"
+    },
+    {
+      "code": 6002,
+      "name": "InsufficientTreasury",
+      "msg": "Treasury cannot cover the potential payout"
+    },
+    {
+      "code": 6003,
+      "name": "TooEarly",
+      "msg": "Target slot has not been produced yet"
+    },
+    {
+      "code": 6004,
+      "name": "SettleWindowPassed",
+      "msg": "Settlement window has passed; the bet must be expired"
+    },
+    {
+      "code": 6005,
+      "name": "SlotHashNotFound",
+      "msg": "Slot hash for the target slot is not available"
+    },
+    {
+      "code": 6006,
+      "name": "NotExpired",
+      "msg": "Bet has not expired yet"
+    },
+    {
+      "code": 6007,
+      "name": "MathOverflow",
+      "msg": "Arithmetic overflow"
+    }
+  ]
+}
