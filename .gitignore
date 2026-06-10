@@ -3,3 +3,4 @@
 .anchor
 test-ledger
 node_modules
+.claude/
