@@ -1,0 +1,16 @@
+{
+  "name": "coinflip-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "flip": "tsx coinflip.ts"
+  },
+  "dependencies": {
+    "@solana/kit": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

@@ -1,0 +1,25 @@
+[package]
+name = "coinflip"
+version = "0.1.0"
+edition = "2021"
+description = "Provably-fair SOL coinflip with a 51/49 house edge"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "coinflip"
+
+[features]
+default = []
+cpi = ["no-entrypoint"]
+no-entrypoint = []
+no-idl = []
+no-log-ix-name = []
+idl-build = ["anchor-lang/idl-build"]
+
+[dependencies]
+anchor-lang = "0.31.1"
+
+[dev-dependencies]
+litesvm = "0.6"
+solana-sdk = "2.2"
+solana-program = "2.2"
